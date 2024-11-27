@@ -10,6 +10,10 @@ class Platform(pygame.sprite.Sprite):
         
         # Set the rectangle for positioning
         self.rect = self.image.get_rect(topleft=(x, y))
+        self.rect.x = x
+        self.rect.y = y
+        self.rect.width = width
+        self.rect.height = height
 
     def update(self):
         # Placeholder for future update logic, such as movement or interaction

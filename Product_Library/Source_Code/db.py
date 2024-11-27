@@ -13,7 +13,7 @@ def create_save(player: Player, enemies: list[Enemy], platforms: list[Platform])
 
     # Create Player Table
     player_save = """CREATE TABLE IF NOT EXISTS
-    player(player_id VARCHAR PRIMARY KEY, level INTEGER, health INTEGER)"""
+    player(player_id INTEGER PRIMARY KEY AUTOINCREMENT, level INTEGER, health INTEGER)"""
     CURSOR.execute(player_save)
 
     # Create enemy table
@@ -27,8 +27,8 @@ def create_save(player: Player, enemies: list[Enemy], platforms: list[Platform])
     CURSOR.execute(platform_save)
 
     # Add to player
-    CURSOR.execute("""INSERT INTO player (player_id, level, health) VALUES (?, ?, ?)""",
-                   (1, player.level, player.health))
+    CURSOR.execute("""INSERT INTO player (level, health) VALUES (?, ?, ?)""",
+                   (player.level, player.health)) #TODO make sure player.id not inserted (already autoincrementing)
     
     # Add to enemies
     for count, enemy in enumerate(enemies, start=1):
@@ -38,7 +38,7 @@ def create_save(player: Player, enemies: list[Enemy], platforms: list[Platform])
     # Add to platforms    
     for count, platform in enumerate(platforms, start=1):
         CURSOR.execute("""INSERT INTO platforms (platform_id, location_x, location_y, width, height) VALUES (?, ?, ?, ?, ?)""",
-                       (count, platform.rect.x, platform.rect.y, platform.width, platform.height))
+                       (count, platform.rect.x, platform.rect.y, platform.rect.width, platform.rect.height))
 
 def load_player_save() -> Player:
     """Returns a Player object with attributes from 
@@ -102,5 +102,3 @@ def delete_save():
         print(f"An error occurred while deleting the save file: {e}")
 
 
-print(load_player_save)
-print(load_enemies_save)

@@ -11,7 +11,8 @@ class Player(Entity):
     def __init__(self, health: int):
         # Initialize the parent class
         super().__init__(health)
-        
+        self.id = 'player'
+
         # Load player sprite
         self.image = pygame.image.load("Product_Library/Source_Code/art/player_frame1_True.png")
         self.rect = self.image.get_rect()

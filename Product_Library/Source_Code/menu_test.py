@@ -91,6 +91,14 @@ def draw_menu():
         text_rect = text_surface.get_rect(center=button.center)
         screen.blit(text_surface, text_rect)
 
+def draw_pause():
+    for button, text in buttons:
+        pygame.draw.rect(screen, (50, 50, 50), button)
+        # Render text
+        text_surface = FONT.render(text, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=button.center)
+        screen.blit(text_surface, text_rect)
+
 
 def handle_click(pos):
     """Handle mouse click on the menu."""
