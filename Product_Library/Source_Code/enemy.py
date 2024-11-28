@@ -1,6 +1,6 @@
 import pygame
-
-class Enemy(pygame.sprite.Sprite):
+from entity import Entity
+class Enemy(Entity):
     def __init__(self, player_image):
         super().__init__()
         self.image = pygame.image.load(player_image)
