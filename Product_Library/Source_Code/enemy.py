@@ -1,9 +1,9 @@
 import pygame
 from entity import Entity
 class Enemy(Entity):
-    def __init__(self, player_image):
-        super().__init__()
-        self.image = pygame.image.load(player_image)
+    def __init__(self,):
+        super().__init__(10)
+        self.image = pygame.image.load('Product_Library/Source_Code/art/enemy_frame1_False.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = (400, 500)
         self.direction = True  # Start moving in one direction (e.g., right)
@@ -24,3 +24,7 @@ class Enemy(Entity):
         elif self.rect.left <= 0:   # Left boundary
             self.image = pygame.image.load("Product_Library/Source_Code/art/enemy_frame1_True.png")
             self.direction = True
+
+    def set_xy(self, x, y):
+        self.rect.x = x
+        self.rect.y = y

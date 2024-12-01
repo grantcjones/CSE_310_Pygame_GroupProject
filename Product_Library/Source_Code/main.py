@@ -52,7 +52,6 @@ for i, option in enumerate(options):
     button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, 150 + i * 100, 200, 50)
     buttons.append((button_rect, option))
 
-
 def start_menu():
     """Draw the start-menu options."""
     # Load and scale the background image
@@ -75,12 +74,20 @@ def start_handle_click(pos):
             if text == "New Game":
                 print("New Game selected!")
                 # Add your logic for starting a new game here
-                run()
+                num_platforms = random.randint(10, 15)
+                platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
+                exit_rect = generate_exit(platforms)
+                enemies = (Enemy(), Enemy(), Enemy())
+                player = Player(10)
+
+                run(player, enemies, platforms, exit_rect)
             elif text == "Load Game":
                 print("Load Game selected!")
                 # Add your logic for loading a game here
                 
-                run() #! Stubbed, nneds data query added
+                platforms = load_platforms_save()
+                exit_rect = generate_exit(platforms)
+                run(load_player_save(), load_enemies_save(), platforms, exit_rect) #! Stubbed, nneds data query added
             elif text == "Exit":
                 print("Exiting game...")
                 pygame.quit()
@@ -185,27 +192,24 @@ def generate_exit(platforms):
     return Gate(x, y)
 
 # Function to display level transition with fade effect
-def level_transition(level):
+def level_transition(player: Player):
+    player.level += 1
+
     fade_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
     fade_surface.fill((0, 0, 0))
     for alpha in range(0, 255, 5):
         fade_surface.set_alpha(alpha)
         screen.blit(fade_surface, (0, 0))
         font = pygame.font.Font(None, 60)
-        text = font.render(f"Level {level}", True, (255, 255, 255))
+        text = font.render(f"Level {player.level}", True, (255, 255, 255))
         text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         screen.blit(text, text_rect)
         pygame.display.flip()
         pygame.time.delay(30)
 
-def run():
+def run(player, enemies, platforms, exit_rect):
     # Initial background, platforms, and exit generation
     background_image = load_random_background()
-    num_platforms = random.randint(10, 15)
-    platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
-    exit_rect = generate_exit(platforms)
-    enemies = (Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'))
-    player = Player(10)
 
     # Level settings
     level_count = 1
@@ -252,11 +256,12 @@ def run():
                                 paused = False  # Resume the game
                             elif action == "save_exit":
                                 # Save the game and exit
+                                delete_save()
                                 create_save(player, enemies, platforms)
-                                stop_running = True
+                                sys.exit()
                             elif action == "exit":
                                 # Exit the game without saving
-                                stop_running = True
+                                sys.exit()
 
         # Prevent updates to the game while paused
         pygame.display.flip()  # Keep the pause menu visible
@@ -266,13 +271,14 @@ def run():
 
         # Level transition on exit collision
         if player.rect.colliderect(exit_rect):
-            level_count += 1
-            level_transition(level_count)
+            # player.level += 1
+            level_transition(player)
 
             # Determine level type and reset assets
-            is_dungeon = (level_count % 10 == 0)
+            current_level = player.level
+            is_dungeon = (current_level % 10 == 0)
             background_image = load_random_background(is_dungeon)
-            platforms = generate_platforms(num_platforms, exit_rect)
+            platforms = generate_platforms(len(platforms), exit_rect)
             exit_rect = generate_exit(platforms)
             exit_platform = next((platform for platform in platforms if platform.rect.colliderect(exit_rect)), None)
             available_platforms = [platform for platform in platforms if platform != exit_platform]
@@ -283,10 +289,13 @@ def run():
         # if keys[pygame.K_ESCAPE]:
         #     break
 
+        level_count = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
+
         screen.blit(background_image, (0,0))
         platforms.draw(screen)
         screen.blit(exit_rect.image, exit_rect.rect)  # Draw exit rectangle
         screen.blit(player.image, player.rect)  # Draw player on the screen
+        screen.blit(level_count, (10, 20))
         pygame.display.flip()  # Update the display
 
         clock.tick(60)
