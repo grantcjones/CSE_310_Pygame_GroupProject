@@ -19,23 +19,23 @@ except pygame.error as e:
 
 # Constants
 NORMAL_BACKGROUND_IMAGES = [
-    'Product_Library/Source_Code/art/background_1.png',
-    'Product_Library/Source_Code/art/background_2.png',
-    'Product_Library/Source_Code/art/background_3.png',
-    'Product_Library/Source_Code/art/background_4.png',
-    'Product_Library/Source_Code/art/background_5.png',
-    'Product_Library/Source_Code/art/background_6.png',
-    'Product_Library/Source_Code/art/background_7.png',
-    'Product_Library/Source_Code/art/background_8.png',
-    'Product_Library/Source_Code/art/background_9.png',
-    'Product_Library/Source_Code/art/background_10.png'
+    'art/background_1.png',
+    'art/background_2.png',
+    'art/background_3.png',
+    'art/background_4.png',
+    'art/background_5.png',
+    'art/background_6.png',
+    'art/background_7.png',
+    'art/background_8.png',
+    'art/background_9.png',
+    'art/background_10.png'
 ]
 DUNGEON_BACKGROUND_IMAGES = [
-    'Product_Library/Source_Code/art/dungeon_background_1.png',
-    'Product_Library/Source_Code/art/dungeon_background_2.png',
-    'Product_Library/Source_Code/art/dungeon_background_3.png',
-    'Product_Library/Source_Code/art/dungeon_background_4.png',
-    'Product_Library/Source_Code/art/dungeon_background_5.png'
+    'art/dungeon_background_1.png',
+    'art/dungeon_background_2.png',
+    'art/dungeon_background_3.png',
+    'art/dungeon_background_4.png',
+    'art/dungeon_background_5.png'
 ]
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 600
@@ -55,7 +55,7 @@ for i, option in enumerate(options):
 def start_menu():
     """Draw the start-menu options."""
     # Load and scale the background image
-    original_image = pygame.image.load('Product_Library/Source_Code/art/dungeon_wall.png')
+    original_image = pygame.image.load('art/dungeon_wall.png')
     scaled_image = pygame.transform.scale(original_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
     # Draw the background image
     screen.blit(scaled_image, (0, 0))    
@@ -97,7 +97,7 @@ def start_handle_click(pos):
 def pause_menu():
     """Draw the pause menu options."""
     # Load and scale the background image
-    original_image = pygame.image.load('Product_Library/Source_Code/art/scroll.png')
+    original_image = pygame.image.load('art/scroll.png')
     scaled_image = pygame.transform.scale(original_image, (SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200))
     
     # Calculate position for centered background

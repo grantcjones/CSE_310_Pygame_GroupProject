@@ -5,7 +5,7 @@ class Platform(pygame.sprite.Sprite):
         super().__init__()
         
         # Load the platform image and scale it to the specified width and height
-        original_image = pygame.image.load('Product_Library/Source_Code/art/platform.png').convert_alpha()  # Load with transparency support
+        original_image = pygame.image.load('art/platform.png').convert_alpha()  # Load with transparency support
         self.image = pygame.transform.scale(original_image, (width, height))
         
         # Set the rectangle for positioning
