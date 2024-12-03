@@ -3,96 +3,147 @@ import pygame
 from player import Player
 from enemy import Enemy
 from platform_module import Platform
- 
-CONNECTION = sqlite3.connect('save_file.db')
 
+# Connect to the SQLite database
+CONNECTION = sqlite3.connect('save_file.db')
 CURSOR = CONNECTION.cursor()
 
 def create_save(player: Player, enemies: list[Enemy], platforms: list[Platform]) -> None:
-    """ Create a save file"""
+    """Creates the save file with tables and inserts data."""
+    # Create the Player table
+    CURSOR.execute("""
+        CREATE TABLE IF NOT EXISTS player (
+            player_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            level INTEGER, 
+            health INTEGER
+        )
+    """)
 
-    # Create Player Table
-    player_save = """CREATE TABLE IF NOT EXISTS
-    player(player_id INTEGER PRIMARY KEY AUTOINCREMENT, level INTEGER, health INTEGER)"""
-    CURSOR.execute(player_save)
+    # Create the Enemies table
+    CURSOR.execute("""
+        CREATE TABLE IF NOT EXISTS enemies (
+            enemy_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            location_x INTEGER, 
+            location_y INTEGER
+        )
+    """)
 
-    # Create enemy table
-    enemy_save = """CREATE TABLE IF NOT EXISTS
-    enemies(enemy_id INTEGER PRIMARY KEY, location_x INTEGER, location_y INTEGER)"""
-    CURSOR.execute(enemy_save)
+    # Create the Platforms table
+    CURSOR.execute("""
+        CREATE TABLE IF NOT EXISTS platforms (
+            platform_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            location_x INTEGER, 
+            location_y INTEGER, 
+            width INTEGER, 
+            height INTEGER
+        )
+    """)
 
-    # Create platform table
-    platform_save = """CREATE TABLE IF NOT EXISTS
-    platforms(platform_id INTEGER, location_x INTEGER, location_y INTEGER, width INTEGER, height INTEGER)"""
-    CURSOR.execute(platform_save)
+    # Insert player data
+    CURSOR.execute("""
+        INSERT INTO player (level, health) 
+        VALUES (?, ?)
+    """, (player.level, player.health))
 
-    # Add to player
-    CURSOR.execute("""INSERT INTO player (level, health) VALUES (?, ?, ?)""",
-                   (player.level, player.health)) #TODO make sure player.id not inserted (already autoincrementing)
-    
-    # Add to enemies
-    for count, enemy in enumerate(enemies, start=1):
-        CURSOR.execute("""INSERT INTO enemies (enemy_id, location_x, location_y) VALUES (?, ?, ?)""",
-                       (count, enemy.rect.x, enemy.rect.y))
-           
-    # Add to platforms    
-    for count, platform in enumerate(platforms, start=1):
-        CURSOR.execute("""INSERT INTO platforms (platform_id, location_x, location_y, width, height) VALUES (?, ?, ?, ?, ?)""",
-                       (count, platform.rect.x, platform.rect.y, platform.rect.width, platform.rect.height))
+    # Insert enemies data
+    for enemy in enemies:
+        CURSOR.execute("""
+            INSERT INTO enemies (location_x, location_y) 
+            VALUES (?, ?)
+        """, (enemy.rect.x, enemy.rect.y))
+
+    # Insert platforms data
+    for platform in platforms:
+        CURSOR.execute("""
+            INSERT INTO platforms (location_x, location_y, width, height) 
+            VALUES (?, ?, ?, ?)
+        """, (platform.rect.x, platform.rect.y, platform.rect.width, platform.rect.height))
+
+    # Commit changes to the database
+    CONNECTION.commit()
+
 
 def load_player_save() -> Player:
-    """Returns a Player object with attributes from 
-    the save file."""
+    """Loads the player data from the save file and returns a Player object."""
+    # Check if the player table exists
+    CURSOR.execute("""
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='player'
+    """)
+    table_exists = CURSOR.fetchone()
 
-    CURSOR.execute('IF TABLE player EXISTS SELECT * FROM player')
-    player_numbers = CURSOR.fetchall()
+    if not table_exists:
+        raise ValueError("Player table does not exist in the database.")
 
-    return Player(player_numbers[0][1], player_numbers[0][2])
+    # Retrieve the player data
+    CURSOR.execute("SELECT * FROM player")
+    player_data = CURSOR.fetchone()  # Fetch the first row
+
+    if not player_data:
+        raise ValueError("No player data found in the save file.")
+
+    player = Player(health=player_data[2])
+    player.level = player_data[1]
+
+    return player
+
 
 def load_enemies_save() -> list[Enemy]:
-    """Receives a tuple from the save file and returns a list of Enemy objects."""
+    """Loads the enemies data from the save file and returns a list of Enemy objects."""
+    # Check if the enemies table exists
+    CURSOR.execute("""
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='enemies'
+    """)
+    table_exists = CURSOR.fetchone()
 
-    enemy_list = []
+    if not table_exists:
+        raise ValueError("Enemies table does not exist in the database.")
 
-    CURSOR.execute('SELECT * FROM enemies')
-    enemies = CURSOR.fetchall()
+    # Retrieve all enemy data
+    CURSOR.execute("SELECT * FROM enemies")
+    enemies_data = CURSOR.fetchall()
 
-    for enemy in enemies:
-        new_enemy = Enemy()  # Adjust as needed to set a default or variable image
+    enemies = []
+    for enemy in enemies_data:
+        new_enemy = Enemy()  # Create an Enemy object
+        new_enemy.set_xy(enemy[1], enemy[2])  # Set x and y positions
+        enemies.append(new_enemy)
 
-        new_enemy.set_xy(enemy[3], enemy[4])  # Assuming `enemy[2]` is `location_x` and `enemy[3]` is `location_y`
-        enemy_list.append(new_enemy)
+    return enemies
 
-    return enemy_list
 
 def load_platforms_save() -> list[Platform]:
-    """Receives a tuple from the save file and returns 
-    a list of Platform objects."""
-    
-    platforms = []  # Initialize as a list, not a tuple
-    count = -1
+    """Loads the platforms data from the save file and returns a list of Platform objects."""
+    # Check if the platforms table exists
+    CURSOR.execute("""
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='platforms'
+    """)
+    table_exists = CURSOR.fetchone()
 
-    CURSOR.execute('SELECT * FROM platforms')
+    if not table_exists:
+        raise ValueError("Platforms table does not exist in the database.")
+
+    # Retrieve all platform data
+    CURSOR.execute("SELECT * FROM platforms")
     platforms_data = CURSOR.fetchall()
 
+    platforms = pygame.sprite.Group()
     for platform in platforms_data:
-        count += 1
         # Assuming platform columns are (platform_id, location_x, location_y, width, height)
         new_platform = Platform(platform[1], platform[2], platform[3], platform[4])
-        platforms.append(new_platform)
+        platforms.add(new_platform)
 
     return platforms
 
-def delete_save():
-    """Deletes the tables of a save file."""
+
+def delete_save() -> None:
+    """Deletes all tables from the save file."""
     try:
-        # Drop the player table
+        # Drop the tables if they exist
         CURSOR.execute("DROP TABLE IF EXISTS player")
-
-        # Drop the enemies table
         CURSOR.execute("DROP TABLE IF EXISTS enemies")
-
-        # Drop the platforms table
         CURSOR.execute("DROP TABLE IF EXISTS platforms")
 
         # Commit the changes
@@ -100,5 +151,3 @@ def delete_save():
         print("Save file deleted successfully.")
     except sqlite3.Error as e:
         print(f"An error occurred while deleting the save file: {e}")
-
-
