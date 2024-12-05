@@ -18,9 +18,16 @@ The project was developed using:
 # Collaborators
 
 The team members who contributed to this project are:
-- Alex Cordova
+- Alex Cordova 
 - Grant C. Jones
 - Victor Granado
+
+# Roles and Responsibilites 
+
+The team members' roles include: 
+- Alex Cordova: Documentation Manager and Quality Assurance 
+- Grant C. Jones: Project Manager and Team Leader 
+- Victor Granado: Configuration Manager and Graphic Designer 
 
 # Useful Websites
 
