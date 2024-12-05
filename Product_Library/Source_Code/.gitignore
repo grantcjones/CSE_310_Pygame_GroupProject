@@ -37,6 +37,10 @@ yarn-error.log
 testem.log
 /typings
 
+# Ignore Python bytecode
+*.pyc
+__pycache__/
+
 # System files
 .DS_Store
 Thumbs.db
