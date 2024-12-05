@@ -7,6 +7,7 @@ from enemy import Enemy
 from platform_module import Platform
 from gate import Gate
 from backgroundmusic import BackgroundMusic
+import itertools
 
 from db import create_save, load_player_save, load_enemies_save, load_platforms_save, delete_save
 
@@ -66,13 +67,57 @@ for i, option in enumerate(options):
     buttons.append((button_rect, option))
 
 
+
+
+def interpolate_color(color1, color2, t):
+    """Interpolate between two colors based on t (0 to 1)."""
+    return tuple(
+        int(color1[i] * (1 - t) + color2[i] * t)
+        for i in range(3)
+    )
+
 def start_menu():
-    """Draw the start-menu options."""
+    """Draw the start-menu options with a pulsating, color-changing title."""
     # Load and scale the background image
     original_image = pygame.image.load('Product_Library/Source_Code/art/dungeon_wall.png')
     scaled_image = pygame.transform.scale(original_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
     # Draw the background image
-    screen.blit(scaled_image, (0, 0))    
+    screen.blit(scaled_image, (0, 0))
+
+    # Create a larger font for the title
+    title_font = pygame.font.Font(None, 100)  # Adjust size as needed
+    title_text = "JUMP QUEST"
+    
+    # Define the colors for pulsating
+    colors = [
+        (255, 215, 0),   # Gold
+        (178, 34, 34),   # Deep Red
+        (0, 255, 128),   # Glowing Green
+        (0, 191, 255)    # Icy Blue
+    ]
+
+    # Get elapsed time and create a sine wave effect
+    elapsed_time = pygame.time.get_ticks() / 1000  # Convert to seconds
+    sine_value = (math.sin(elapsed_time * 2 * math.pi / 2) + 1) / 2  # Oscillates between 0 and 1 over 2 seconds
+    
+    # Cycle through the colors and interpolate
+    color_index = int(elapsed_time) % len(colors)
+    next_color_index = (color_index + 1) % len(colors)
+    current_color = interpolate_color(colors[color_index], colors[next_color_index], sine_value)
+
+    # Render the title with the interpolated color
+    title_surface = title_font.render(title_text, True, current_color)
+    
+    # Add a shadow for depth
+    shadow_surface = title_font.render(title_text, True, (50, 50, 50))  # Dark gray for shadow
+    shadow_rect = shadow_surface.get_rect(center=(SCREEN_WIDTH // 2 + 5, SCREEN_HEIGHT // 6 + 5))
+    screen.blit(shadow_surface, shadow_rect)
+
+    # Render the main title slightly above the shadow
+    title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 6))
+    screen.blit(title_surface, title_rect)
+
+    # Draw the buttons
     for button, text in buttons:
         # Draw button
         pygame.draw.rect(screen, (210, 180, 140), button)
@@ -80,6 +125,9 @@ def start_menu():
         text_surface = font.render(text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=button.center)
         screen.blit(text_surface, text_rect)
+
+
+
 
 def start_handle_click(pos):
     """Handle mouse click on the start-menu."""
