@@ -36,3 +36,17 @@ Here are some planned improvements and fixes for the project:
 * Introduce multiplayer functionality.
 * Enhance graphics and animations.
 * Fix minor bugs related to collision detection and scoring.
+
+# Setup Instructions
+
+These are the instructions to be able to run the project.
+* Open the terminal.
+* Navigate to the project directory. (CSE_310_Pygame_GroupProject)
+* Install dependencies
+```bash
+pip install -r requirements.txt
+```
+* Navigate to 'main.py' in the Source_Code folder and run it.
+```bash
+python main.py
+```
