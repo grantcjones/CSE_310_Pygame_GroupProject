@@ -240,13 +240,14 @@ def level_transition(level):
         pygame.display.flip()
         pygame.time.delay(30)
 
+
 def run():
     global used_backgrounds  # Declare global to access the global variable
 
 
     # Initial background, platforms, and exit generation
     background_image = load_random_background()
-    num_platforms = random.randint(9, 12) #range number of platforms
+    num_platforms = random.randint(20, 30) #range number of platforms
     platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
     exit_rect = generate_exit(platforms)
     enemies = (Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'))
@@ -331,6 +332,7 @@ def run():
         # if keys[pygame.K_ESCAPE]:
         #     break
 
+        # Draw everything
         screen.blit(background_image, (0,0))
         platforms.draw(screen)
         screen.blit(exit_rect.image, exit_rect.rect)  # Draw exit rectangle

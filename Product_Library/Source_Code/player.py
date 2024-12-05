@@ -18,7 +18,7 @@ class Player(Entity):
         self.rect = self.image.get_rect()
         self.rect.topleft = (500, 500)
 
-        self.half_jump_height = 20
+        self.half_jump_height = 18
         self.is_jumping = False
         self.jumps_left = 2
 

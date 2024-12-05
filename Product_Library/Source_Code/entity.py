@@ -10,7 +10,7 @@ class Entity(pygame.sprite.Sprite):
         self.animation_True = []
         self.animation_False = []
 
-        self.move_speed = 5
+        self.move_speed = 4
         
         self.gravity = 2
         self.velocity_y = 0        
