@@ -14,7 +14,7 @@ class Player(Entity):
         self.id = 'player'
 
         # Load player sprite
-        self.image = pygame.image.load("Product_Library/Source_Code/art/player_frame1_True.png")
+        self.image = pygame.image.load("art/player_frame1_True.png")
         self.rect = self.image.get_rect()
         self.rect.topleft = (500, 500)
 
@@ -25,12 +25,12 @@ class Player(Entity):
         # Initialize player-specific attributes
         self.level = 1  # Start the player at level 1
         self.animation_True = [
-            "Product_Library/Source_Code/art/player_frame1_True.png",
-            "Product_Library/Source_Code/art/player_frame2_True.png"
+            "art/player_frame1_True.png",
+            "art/player_frame2_True.png"
         ]
         self.animation_False = [
-            "Product_Library/Source_Code/art/player_frame1_False.png",
-            "Product_Library/Source_Code/art/player_frame2_False.png"
+            "art/player_frame1_False.png",
+            "art/player_frame2_False.png"
         ]
 
     def move(self):
