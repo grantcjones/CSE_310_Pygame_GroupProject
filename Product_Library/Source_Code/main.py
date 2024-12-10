@@ -33,20 +33,20 @@ NORMAL_BACKGROUND_IMAGES = [
     'art/background_10.png'
 ]
 DUNGEON_BACKGROUND_IMAGES = [
-    'Product_Library/Source_Code/art/dungeon_background_1.png',
-    'Product_Library/Source_Code/art/dungeon_background_2.png',
-    'Product_Library/Source_Code/art/dungeon_background_3.png',
-    'Product_Library/Source_Code/art/dungeon_background_4.png',
-    'Product_Library/Source_Code/art/dungeon_background_5.png'
+    'art/dungeon_background_1.png',
+    'art/dungeon_background_2.png',
+    'art/dungeon_background_3.png',
+    'art/dungeon_background_4.png',
+    'art/dungeon_background_5.png'
 ]
 
 MUSIC_FILES = [
-    "Product_Library/Source_Code/music/song1.mp3",
-    "Product_Library/Source_Code/music/song2.mp3",
-    "Product_Library/Source_Code/music/song3.mp3",
-    "Product_Library/Source_Code/music/song4.mp3",
-    "Product_Library/Source_Code/music/song5.mp3",
-    "Product_Library/Source_Code/music/song6.mp3",
+    "music/song1.mp3",
+    "music/song2.mp3",
+    "music/song3.mp3",
+    "music/song4.mp3",
+    "music/song5.mp3",
+    "music/song6.mp3",
 ]
 
 music = BackgroundMusic(MUSIC_FILES)
@@ -308,7 +308,7 @@ def run():
     num_platforms = random.randint(20, 30) #range number of platforms
     platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
     exit_rect = generate_exit(platforms)
-    enemies = (Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'))
+    enemies = (Enemy('art/enemy_frame1_True.png'), Enemy('art/enemy_frame1_True.png'), Enemy('art/enemy_frame1_True.png'))
     player = Player(10)
 
     # Level settings
