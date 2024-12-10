@@ -207,7 +207,7 @@ def level_transition(player: Player):
         pygame.display.flip()
         pygame.time.delay(30)
 
-def run(player, enemies, platforms, exit_rect):
+def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.Group, exit_rect: Gate) -> None:
     # Initial background, platforms, and exit generation
     background_image = load_random_background()
 
