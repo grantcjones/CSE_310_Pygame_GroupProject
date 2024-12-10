@@ -12,7 +12,7 @@ class Entity(pygame.sprite.Sprite):
 
         self.move_speed = 4
         
-        self.gravity = 1
+        self.gravity = 2
         self.velocity_y = 0        
 
         self.current_frame = 0

@@ -18,12 +18,12 @@ class Player(Entity):
         self.rect = self.image.get_rect()
         self.rect.topleft = (500, 500)
 
-        self.half_jump_height = 13
+        self.half_jump_height = 18
         self.is_jumping = False
         self.jumps_left = 2
 
         # Initialize player-specific attributes
-        self.level = 1  # Start the player at level 1
+        self.level = 0  # Start the player at level 1
         self.animation_True = [
             "art/player_frame1_True.png",
             "art/player_frame2_True.png"

@@ -6,6 +6,8 @@ from player import Player
 from enemy import Enemy
 from platform_module import Platform
 from gate import Gate
+from backgroundmusic import BackgroundMusic
+import itertools
 
 from db import create_save, load_player_save, load_enemies_save, load_platforms_save, delete_save
 
@@ -31,12 +33,24 @@ NORMAL_BACKGROUND_IMAGES = [
     'art/background_10.png'
 ]
 DUNGEON_BACKGROUND_IMAGES = [
-    'art/dungeon_background_1.png',
-    'art/dungeon_background_2.png',
-    'art/dungeon_background_3.png',
-    'art/dungeon_background_4.png',
-    'art/dungeon_background_5.png'
+    'Product_Library/Source_Code/art/dungeon_background_1.png',
+    'Product_Library/Source_Code/art/dungeon_background_2.png',
+    'Product_Library/Source_Code/art/dungeon_background_3.png',
+    'Product_Library/Source_Code/art/dungeon_background_4.png',
+    'Product_Library/Source_Code/art/dungeon_background_5.png'
 ]
+
+MUSIC_FILES = [
+    "Product_Library/Source_Code/music/song1.mp3",
+    "Product_Library/Source_Code/music/song2.mp3",
+    "Product_Library/Source_Code/music/song3.mp3",
+    "Product_Library/Source_Code/music/song4.mp3",
+    "Product_Library/Source_Code/music/song5.mp3",
+    "Product_Library/Source_Code/music/song6.mp3",
+]
+
+music = BackgroundMusic(MUSIC_FILES)
+
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 600
 
@@ -52,13 +66,58 @@ for i, option in enumerate(options):
     button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, 150 + i * 100, 200, 50)
     buttons.append((button_rect, option))
 
+
+
+
+def interpolate_color(color1, color2, t):
+    """Interpolate between two colors based on t (0 to 1)."""
+    return tuple(
+        int(color1[i] * (1 - t) + color2[i] * t)
+        for i in range(3)
+    )
+
 def start_menu():
-    """Draw the start-menu options."""
+    """Draw the start-menu options with a pulsating, color-changing title."""
     # Load and scale the background image
     original_image = pygame.image.load('art/dungeon_wall.png')
     scaled_image = pygame.transform.scale(original_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
     # Draw the background image
-    screen.blit(scaled_image, (0, 0))    
+    screen.blit(scaled_image, (0, 0))
+
+    # Create a larger font for the title
+    title_font = pygame.font.Font(None, 100)  # Adjust size as needed
+    title_text = "JUMP QUEST"
+    
+    # Define the colors for pulsating
+    colors = [
+        (255, 215, 0),   # Gold
+        (178, 34, 34),   # Deep Red
+        (0, 255, 128),   # Glowing Green
+        (0, 191, 255)    # Icy Blue
+    ]
+
+    # Get elapsed time and create a sine wave effect
+    elapsed_time = pygame.time.get_ticks() / 1000  # Convert to seconds
+    sine_value = (math.sin(elapsed_time * 2 * math.pi / 2) + 1) / 2  # Oscillates between 0 and 1 over 2 seconds
+    
+    # Cycle through the colors and interpolate
+    color_index = int(elapsed_time) % len(colors)
+    next_color_index = (color_index + 1) % len(colors)
+    current_color = interpolate_color(colors[color_index], colors[next_color_index], sine_value)
+
+    # Render the title with the interpolated color
+    title_surface = title_font.render(title_text, True, current_color)
+    
+    # Add a shadow for depth
+    shadow_surface = title_font.render(title_text, True, (50, 50, 50))  # Dark gray for shadow
+    shadow_rect = shadow_surface.get_rect(center=(SCREEN_WIDTH // 2 + 5, SCREEN_HEIGHT // 6 + 5))
+    screen.blit(shadow_surface, shadow_rect)
+
+    # Render the main title slightly above the shadow
+    title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 6))
+    screen.blit(title_surface, title_rect)
+
+    # Draw the buttons
     for button, text in buttons:
         # Draw button
         pygame.draw.rect(screen, (210, 180, 140), button)
@@ -66,6 +125,9 @@ def start_menu():
         text_surface = font.render(text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=button.center)
         screen.blit(text_surface, text_rect)
+
+
+
 
 def start_handle_click(pos):
     """Handle mouse click on the start-menu."""
@@ -140,7 +202,7 @@ def pause_handle_click(pos, pause_buttons):
                 return "exit"
 
 # Level settings
-# level_count = 1
+#level_count = 0
 used_backgrounds = []
 # paused = False
 
@@ -152,11 +214,15 @@ clock = pygame.time.Clock()
 def load_random_background(is_dungeon=False):
     global used_backgrounds
     background_list = DUNGEON_BACKGROUND_IMAGES if is_dungeon else NORMAL_BACKGROUND_IMAGES
+    
+    # Reset used backgrounds if transitioning to a new dungeon level
     if len(used_backgrounds) == len(background_list):
-        used_backgrounds = []  # Reset used images when all have been used
-
-    background_image_path = random.choice([bg for bg in background_list if bg not in used_backgrounds])
+        used_backgrounds = []
+    
+    available_backgrounds = [bg for bg in background_list if bg not in used_backgrounds]
+    background_image_path = random.choice(available_backgrounds)
     used_backgrounds.append(background_image_path)
+
     try:
         background_image = pygame.image.load(background_image_path)
         return pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -164,32 +230,57 @@ def load_random_background(is_dungeon=False):
         print(f"Error loading background image: {e}")
         sys.exit(1)
 
-# Function to generate platforms with no overlap
+
+# Constants for minimum and maximum gaps between platforms
+MIN_GAP_X = 100  # minimum gap in the x direction
+MAX_GAP_X = 400  # maximum gap in the x direction
+MIN_GAP_Y = 80   # minimum gap in the y direction
+MAX_GAP_Y = 300  # maximum gap in the y direction
+
+# Modified generate_platforms function to ensure gaps between platforms
 def generate_platforms(num_platforms, exit_rect):
     platforms = pygame.sprite.Group()
+    last_platform_rect = None
+
     for _ in range(num_platforms):
         attempt = 0
         while attempt < 10:
             width = random.randint(80, 200)
             height = 20
-            x = random.randint(0, SCREEN_WIDTH - width)
-            y = random.randint(50, SCREEN_HEIGHT - height - 50)
+            if last_platform_rect:
+                # Set x and y based on the last platform to maintain gaps
+                x = last_platform_rect.right + random.randint(MIN_GAP_X, MAX_GAP_X)
+                y = last_platform_rect.top + random.randint(-MAX_GAP_Y, MAX_GAP_Y)
+                # Ensure new platform doesn't go off-screen
+                if x + width > SCREEN_WIDTH:
+                    x = random.randint(0, SCREEN_WIDTH - width)
+                if y < 50 or y > SCREEN_HEIGHT - height - 50:
+                    y = random.randint(50, SCREEN_HEIGHT - height - 50)
+            else:
+                # Position first platform randomly within screen bounds
+                x = random.randint(0, SCREEN_WIDTH - width)
+                y = random.randint(50, SCREEN_HEIGHT - height - 50)
+
             new_platform = Platform(x, y, width, height)
 
+            # Ensure no overlap with existing platforms and no collision with exit
             if not any(platform.rect.colliderect(new_platform.rect) for platform in platforms) and \
                not new_platform.rect.colliderect(exit_rect):
                 platforms.add(new_platform)
+                last_platform_rect = new_platform.rect  # Update last platform position
                 break
             attempt += 1
     return platforms
 
-# Function to generate exit rectangle on top of a platform
+# Function to generate exit rectangle exactly on top of a platform
 def generate_exit(platforms):
-    selected_platform = random.choice(list(platforms))
-    exit_width, exit_height = 50, 50
-    x = selected_platform.rect.centerx - exit_width // 2
-    y = selected_platform.rect.top - exit_height
-    return Gate(x, y)
+    selected_platform = random.choice(list(platforms))  # Select a random platform
+    exit_width, exit_height = 50, 50  # Dimensions of the gate
+    x = selected_platform.rect.centerx - exit_width // 2  # Center the gate horizontally on the platform
+    y = selected_platform.rect.top - exit_height  # Position the gate so its bottom aligns with the platform's top
+    return Gate(x, y + exit_height, exit_width, exit_height)
+
+
 
 # Function to display level transition with fade effect
 def level_transition(player: Player):
@@ -207,12 +298,21 @@ def level_transition(player: Player):
         pygame.display.flip()
         pygame.time.delay(30)
 
-def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.Group, exit_rect: Gate) -> None:
+
+def run():
+    global used_backgrounds  # Declare global to access the global variable
+
+
     # Initial background, platforms, and exit generation
     background_image = load_random_background()
+    num_platforms = random.randint(20, 30) #range number of platforms
+    platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
+    exit_rect = generate_exit(platforms)
+    enemies = (Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'))
+    player = Player(10)
 
     # Level settings
-    level_count = 1
+    level_count = 0
     used_backgrounds = []
     paused = False
     stop_running = False
@@ -271,8 +371,11 @@ def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.G
 
         # Level transition on exit collision
         if player.rect.colliderect(exit_rect):
-            # player.level += 1
-            level_transition(player)
+            level_count += 1
+            level_transition(level_count)
+
+            # Change background music
+            music.next_song()
 
             # Determine level type and reset assets
             current_level = player.level
