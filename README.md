@@ -43,3 +43,45 @@ Here are some planned improvements and fixes for the project:
 * Introduce multiplayer functionality.
 * Enhance graphics and animations.
 * Fix minor bugs related to collision detection and scoring.
+
+# Setup Instructions
+
+Clone the repository
+* First, clone the repository to your local machine using Git:
+
+```bash
+git clone <repository_url>
+```
+Navigate to the project directory
+* Use the terminal or command prompt to navigate to the project directory:
+
+```bash
+cd CSE_310_Pygame_GroupProject
+```
+Create a virtual environment (optional, but recommended)
+* It's best to use a virtual environment to avoid conflicts with other Python packages:
+```bash
+python -m venv venv
+```
+Activate the virtual environment
+
+* On Windows, use:
+```bash
+.\venv\Scripts\activate
+```
+* On Mac/Linux, use:
+```bash
+source venv/bin/activate
+```
+Install dependencies
+* Install all required dependencies listed in the requirements.txt file:
+```bash
+pip install -r requirements.txt
+```
+Run the game
+* Navigate to the Source_Code folder and run the main game script:=
+```bash
+cd Source_Code
+python main.py
+```
+
