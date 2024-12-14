@@ -33,24 +33,25 @@ NORMAL_BACKGROUND_IMAGES = [
     'art/background_10.png'
 ]
 DUNGEON_BACKGROUND_IMAGES = [
-    'Product_Library/Source_Code/art/dungeon_background_1.png',
-    'Product_Library/Source_Code/art/dungeon_background_2.png',
-    'Product_Library/Source_Code/art/dungeon_background_3.png',
-    'Product_Library/Source_Code/art/dungeon_background_4.png',
-    'Product_Library/Source_Code/art/dungeon_background_5.png'
+    'art/dungeon_background_1.png',
+    'art/dungeon_background_2.png',
+    'art/dungeon_background_3.png',
+    'art/dungeon_background_4.png',
+    'art/dungeon_background_5.png'
 ]
 
+used_backgrounds = []
+
 MUSIC_FILES = [
-    "Product_Library/Source_Code/music/song1.mp3",
-    "Product_Library/Source_Code/music/song2.mp3",
-    "Product_Library/Source_Code/music/song3.mp3",
-    "Product_Library/Source_Code/music/song4.mp3",
-    "Product_Library/Source_Code/music/song5.mp3",
-    "Product_Library/Source_Code/music/song6.mp3",
+    "music/song1.mp3",
+    "music/song2.mp3",
+    "music/song3.mp3",
+    "music/song4.mp3",
+    "music/song5.mp3",
+    "music/song6.mp3",
 ]
 
 music = BackgroundMusic(MUSIC_FILES)
-
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 600
 
@@ -67,14 +68,13 @@ for i, option in enumerate(options):
     buttons.append((button_rect, option))
 
 
-
-
 def interpolate_color(color1, color2, t):
     """Interpolate between two colors based on t (0 to 1)."""
     return tuple(
         int(color1[i] * (1 - t) + color2[i] * t)
         for i in range(3)
     )
+
 
 def start_menu():
     """Draw the start-menu options with a pulsating, color-changing title."""
@@ -127,8 +127,6 @@ def start_menu():
         screen.blit(text_surface, text_rect)
 
 
-
-
 def start_handle_click(pos):
     """Handle mouse click on the start-menu."""
     for button, text in buttons:
@@ -149,7 +147,7 @@ def start_handle_click(pos):
                 
                 platforms = load_platforms_save()
                 exit_rect = generate_exit(platforms)
-                run(load_player_save(), load_enemies_save(), platforms, exit_rect) #! Stubbed, nneds data query added
+                run(load_player_save(), load_enemies_save(), platforms, exit_rect)
             elif text == "Exit":
                 print("Exiting game...")
                 pygame.quit()
@@ -190,6 +188,7 @@ def pause_menu():
 
     return pause_buttons
 
+
 def pause_handle_click(pos, pause_buttons):
     """Handle mouse clicks on the pause menu."""
     for button, text in pause_buttons:
@@ -201,10 +200,6 @@ def pause_handle_click(pos, pause_buttons):
             elif text == "Exit":
                 return "exit"
 
-# Level settings
-#level_count = 0
-used_backgrounds = []
-# paused = False
 
 # Screen setup
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -272,6 +267,7 @@ def generate_platforms(num_platforms, exit_rect):
             attempt += 1
     return platforms
 
+
 # Function to generate exit rectangle exactly on top of a platform
 def generate_exit(platforms):
     selected_platform = random.choice(list(platforms))  # Select a random platform
@@ -279,7 +275,6 @@ def generate_exit(platforms):
     x = selected_platform.rect.centerx - exit_width // 2  # Center the gate horizontally on the platform
     y = selected_platform.rect.top - exit_height  # Position the gate so its bottom aligns with the platform's top
     return Gate(x, y + exit_height, exit_width, exit_height)
-
 
 
 # Function to display level transition with fade effect
@@ -299,17 +294,11 @@ def level_transition(player: Player):
         pygame.time.delay(30)
 
 
-def run():
+def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.Group, exit_rect: Gate):
     global used_backgrounds  # Declare global to access the global variable
-
 
     # Initial background, platforms, and exit generation
     background_image = load_random_background()
-    num_platforms = random.randint(20, 30) #range number of platforms
-    platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
-    exit_rect = generate_exit(platforms)
-    enemies = (Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'), Enemy('Product_Library/Source_Code/art/enemy_frame1_True.png'))
-    player = Player(10)
 
     # Level settings
     level_count = 0
@@ -371,8 +360,7 @@ def run():
 
         # Level transition on exit collision
         if player.rect.colliderect(exit_rect):
-            level_count += 1
-            level_transition(level_count)
+            player.level += 1
 
             # Change background music
             music.next_song()
@@ -388,9 +376,6 @@ def run():
             random_platform = random.choice(available_platforms) if available_platforms else random.choice(list(platforms))
             player.rect.midbottom = (random_platform.rect.centerx, random_platform.rect.top)
 
-        # Exit condition
-        # if keys[pygame.K_ESCAPE]:
-        #     break
 
         level_count = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
 
