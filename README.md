@@ -26,8 +26,8 @@ The team members who contributed to this project are:
 
 The team members' roles include: 
 - Alex Cordova: Documentation Manager and Quality Assurance 
-- Grant C. Jones: Configuration Manager and Graphic Designer 
-- Victor Granado: Project Manager and Team Leader 
+- Grant C. Jones: Project Manager and Graphic Designer 
+- Victor Granado: Team Leader and Configuration Manager
 
 # Useful Websites
 
