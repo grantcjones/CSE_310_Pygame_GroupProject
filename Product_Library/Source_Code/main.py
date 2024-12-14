@@ -38,11 +38,22 @@ DUNGEON_BACKGROUND_IMAGES = [
     'art/dungeon_background_3.png',
     'art/dungeon_background_4.png',
     'art/dungeon_background_5.png'
+    'art/dungeon_background_1.png',
+    'art/dungeon_background_2.png',
+    'art/dungeon_background_3.png',
+    'art/dungeon_background_4.png',
+    'art/dungeon_background_5.png'
 ]
 
 used_backgrounds = []
 
 MUSIC_FILES = [
+    "music/song1.mp3",
+    "music/song2.mp3",
+    "music/song3.mp3",
+    "music/song4.mp3",
+    "music/song5.mp3",
+    "music/song6.mp3",
     "music/song1.mp3",
     "music/song2.mp3",
     "music/song3.mp3",
@@ -279,7 +290,6 @@ def generate_exit(platforms):
 
 # Function to display level transition with fade effect
 def level_transition(player: Player):
-    player.level += 1
 
     fade_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
     fade_surface.fill((0, 0, 0))
@@ -321,7 +331,7 @@ def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.G
         clock.tick(60)  # Limit to 60 frames per second
 
         # Player input handling
-        keys = pygame.key.get_pressed() #! Move player movement logic to Player class
+        keys = pygame.key.get_pressed()
         player.update_entity(keys, platforms, exit_rect, level_count)
 
         if keys[pygame.K_ESCAPE]:
@@ -361,6 +371,7 @@ def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.G
         # Level transition on exit collision
         if player.rect.colliderect(exit_rect):
             player.level += 1
+            level_transition(player)
 
             # Change background music
             music.next_song()
@@ -377,13 +388,13 @@ def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.G
             player.rect.midbottom = (random_platform.rect.centerx, random_platform.rect.top)
 
 
-        level_count = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
+        level_count_display = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
 
         screen.blit(background_image, (0,0))
         platforms.draw(screen)
         screen.blit(exit_rect.image, exit_rect.rect)  # Draw exit rectangle
         screen.blit(player.image, player.rect)  # Draw player on the screen
-        screen.blit(level_count, (10, 20))
+        screen.blit(level_count_display, (10, 20))
         pygame.display.flip()  # Update the display
 
         clock.tick(60)
