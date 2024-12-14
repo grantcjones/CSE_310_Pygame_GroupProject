@@ -33,6 +33,12 @@ class Player(Entity):
             "art/player_frame2_False.png"
         ]
 
+    def get_level(self) -> int:
+        return self.level
+
+    def set_level(self, level: int) -> None:
+        self.level = level
+
     def move(self):
         keys = pygame.key.get_pressed() #! Move player movement logic to Player class
 

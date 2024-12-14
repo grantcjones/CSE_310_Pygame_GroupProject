@@ -127,8 +127,6 @@ def start_menu():
         screen.blit(text_surface, text_rect)
 
 
-
-
 def start_handle_click(pos):
     """Handle mouse click on the start-menu."""
     for button, text in buttons:
@@ -149,7 +147,7 @@ def start_handle_click(pos):
                 
                 platforms = load_platforms_save()
                 exit_rect = generate_exit(platforms)
-                run(load_player_save(), load_enemies_save(), platforms, exit_rect) #! Stubbed, nneds data query added
+                run(load_player_save(), load_enemies_save(), platforms, exit_rect)
             elif text == "Exit":
                 print("Exiting game...")
                 pygame.quit()
@@ -299,7 +297,7 @@ def level_transition(player: Player):
         pygame.time.delay(30)
 
 
-def run():
+def run(player: Player, enemies: pygame.sprite.Group, platforms: pygame.sprite.Group, exit_rect: Gate):
     global used_backgrounds  # Declare global to access the global variable
 
 
@@ -308,7 +306,7 @@ def run():
     num_platforms = random.randint(20, 30) #range number of platforms
     platforms = generate_platforms(num_platforms, pygame.Rect(0, 0, 50, 50))
     exit_rect = generate_exit(platforms)
-    enemies = (Enemy('art/enemy_frame1_True.png'), Enemy('art/enemy_frame1_True.png'), Enemy('art/enemy_frame1_True.png'))
+    enemies = (Enemy(), Enemy(), Enemy())
     player = Player(10)
 
     # Level settings
@@ -332,7 +330,7 @@ def run():
         clock.tick(60)  # Limit to 60 frames per second
 
         # Player input handling
-        keys = pygame.key.get_pressed() #! Move player movement logic to Player class
+        keys = pygame.key.get_pressed()
         player.update_entity(keys, platforms, exit_rect, level_count)
 
         if keys[pygame.K_ESCAPE]:
@@ -372,7 +370,7 @@ def run():
         # Level transition on exit collision
         if player.rect.colliderect(exit_rect):
             level_count += 1
-            level_transition(level_count)
+            level_transition(player)
 
             # Change background music
             music.next_song()
@@ -392,13 +390,13 @@ def run():
         # if keys[pygame.K_ESCAPE]:
         #     break
 
-        level_count = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
+        level_count_display = font.render(f"Player Level: {player.level}", True, (255, 0 , 0))
 
         screen.blit(background_image, (0,0))
         platforms.draw(screen)
         screen.blit(exit_rect.image, exit_rect.rect)  # Draw exit rectangle
         screen.blit(player.image, player.rect)  # Draw player on the screen
-        screen.blit(level_count, (10, 20))
+        screen.blit(level_count_display, (10, 20))
         pygame.display.flip()  # Update the display
 
         clock.tick(60)
