@@ -1,6 +1,6 @@
 # Overview
 
-This project is a 2D platformer game where players navigate through levels, collect items such as coins, speed boosts, and health packs, and defeat enemies to achieve the highest score. Inspired by early Super Mario games, the game features engaging gameplay mechanics and increasing challenges as players progress through the levels.
+This project is a 2D platformer game where players navigate through levels to achieve the highest score. Inspired by early Super Mario games, the game features engaging gameplay mechanics and increasing challenges as players progress through the levels.
 
 To use the software, install the required dependencies listed below, run the game script, and enjoy the experience! Use the arrow keys to move your character and interact with the game environment.
 
